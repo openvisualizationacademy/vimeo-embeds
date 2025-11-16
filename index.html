@@ -20,7 +20,7 @@
       <form id="form">
         <label>
           <span>Paste embed code provided by Vimeo:</span>
-          <textarea name="original" id="original" placeholder='<div style="padding: …' rows="10" required></textarea>
+          <textarea name="original" id="original" placeholder='<div style="padding: …' rows="4" required></textarea>
         </label>
         <button>Convert to Beehiiv</button>
       </form>
@@ -29,7 +29,7 @@
       <hr>
 
       <p>Converted code (to embed Vimeo video on Beehiiv posts) will be generated and pasted here:</p>
-      <textarea name="custom" id="custom" placeholder="…" rows="10"></textarea>
+      <textarea name="custom" id="custom" placeholder="…" rows="6"></textarea>
       <button disabled>Copy to clipboard</button>
 
     </main>
@@ -52,15 +52,15 @@
         // Create a DocumentFragment
         const fragment = document.createRange().createContextualFragment(string);
 
-        // If it has a single child element, return it
-        if (fragment.childElementCount === 1) {
-          return fragment.firstElementChild;
-        }
+        // // If it has a single child element, return it
+        // if (fragment.childElementCount === 1) {
+        //   return fragment.firstElementChild;
+        // }
 
-        // Otherwise, wrap all children in a div and return them
-        const div = document.createElement("div");
-        div.append(...fragment.children);
-        return div;
+        // Wrap all children in an anchor tag and return them
+        const a = document.createElement("a");
+        a.append(...fragment.children);
+        return a;
       }
 
       // Inject custom elements and attributes to make it Beehiiv friendly
@@ -70,6 +70,19 @@
         const id = elements.querySelector("iframe").src.match(/\/video\/(\d+)/)?.[1];
 
         console.log(id);
+
+        // Define href
+        const href = `https://vimeo.com/${ id }`;
+        // TODO: use Beehiiv post URL, instead of Vimeo URL directly
+
+        // If wrapper element is an <a> tag
+        if (elements.tagName === "A") {
+          // Set anchor href
+          elements.href = href;
+        } else {
+          alert("Could not create link");
+          return false;
+        }
 
         // Get video thumbnail (using a 3rd party service)
         const thumbnail = `https://vumbnail.com/${ id }.jpg`
