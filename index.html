@@ -10,10 +10,6 @@
         font-family: monospace;
         font-size: small;
       }
-
-      #custom {
-        user-select: all;
-      }
     </style>
   </head>
   <body>
@@ -24,7 +20,7 @@
       <form id="form">
         <label>
           <span>Paste <strong>Vimeo embed</strong> code provided by Vimeo’s sharing feature:</span>
-          <textarea name="original" id="original" placeholder='<div style="padding:…' rows="3" required></textarea>
+          <textarea name="original" id="original" placeholder='<div style="padding:…' rows="5" required></textarea>
         </label>
         <label>
           <span>Paste <strong>Beehiiv post</strong> link (web version that runs JS and video):</span>
@@ -40,7 +36,7 @@
       <!-- <div style="padding: 20.25% 0 0 0; background-color: red; background-image: url('data:image/svg+xml,%3Csvg width=%22960%22 xmlns=%22http://www.w3.org/2000/svg%22 height=%22540%22 viewBox=%220 0 960 540%22 fill=%22none%22%3E%3Cpath d=%22M459.623046875,240.1474609375C458.0234375,239.19921875,456,240.3525390625,456,242.2119140625L456,297.7880859375C456,299.6474609375,458.0234375,300.80078125,459.623046875,299.8525390625L506.515625,272.064453125C508.083984375,271.134765625,508.083984375,268.865234375,506.515625,267.935546875L459.623046875,240.1474609375Z%22 fill=%22%23fff%22 stroke-width=%224%22 stroke=%22%23ddd%22/%3E%3C/svg%3E'); background-size: cover; background-position: center;"></div> -->
 
       <p>Converted code (to embed Vimeo video on Beehiiv posts) will be generated and pasted here:</p>
-      <textarea name="custom" id="custom" placeholder="…" rows="9"></textarea>
+      <textarea name="custom" id="custom" placeholder="…" rows="10"></textarea>
       <button disabled id="copy">Copy to clipboard</button>
 
     </main>
@@ -50,10 +46,11 @@
 
     <script>
 
+      // Define 16:9 aspect ratio as percentage for padding hack
       const aspectRatio = (9 / 16 * 100).toFixed(2);
 
-      // Fill placeholder of orignal form
-      original.value = `<div style="padding:${ aspectRatio }% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1137428663?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Nina Krug"></iframe></div><script src="https://player.vimeo.com/api/player.js">\</script\>`;
+      // Fill value of orignal form, in case users just want to change the id
+      original.value = `<div style="padding:${ aspectRatio }% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1137428663?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Video"></iframe></div><script src="https://player.vimeo.com/api/player.js">\</script\>`;  
 
       // Call validation function when form is submitted
       form.addEventListener("submit", (event) => {
