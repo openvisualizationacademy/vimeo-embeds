@@ -10,6 +10,10 @@
         font-family: monospace;
         font-size: small;
       }
+
+      #custom {
+        user-select: all;
+      }
     </style>
   </head>
   <body>
@@ -20,11 +24,11 @@
       <form id="form">
         <label>
           <span>Paste <strong>Vimeo embed</strong> code provided by Vimeo’s sharing feature:</span>
-          <textarea name="original" id="original" placeholder='<div style="padding:…' rows="4" required></textarea>
+          <textarea name="original" id="original" placeholder='<div style="padding:…' rows="3" required></textarea>
         </label>
         <label>
           <span>Paste <strong>Beehiiv post</strong> link (web version that runs JS and video):</span>
-          <input name="link" id="link" placeholder="https://openvisualizationacademy.beehiiv.com/p/…" required></textarea>
+          <input name="link" id="link" placeholder="https://openvisualizationacademy.beehiiv.com/p/…"></textarea>
         </label>
 
         <button>Convert to Beehiiv</button>
@@ -33,9 +37,11 @@
       <br><br>
       <hr>
 
+      <!-- <div style="padding: 20.25% 0 0 0; background-color: red; background-image: url('data:image/svg+xml,%3Csvg width=%22960%22 xmlns=%22http://www.w3.org/2000/svg%22 height=%22540%22 viewBox=%220 0 960 540%22 fill=%22none%22%3E%3Cpath d=%22M459.623046875,240.1474609375C458.0234375,239.19921875,456,240.3525390625,456,242.2119140625L456,297.7880859375C456,299.6474609375,458.0234375,300.80078125,459.623046875,299.8525390625L506.515625,272.064453125C508.083984375,271.134765625,508.083984375,268.865234375,506.515625,267.935546875L459.623046875,240.1474609375Z%22 fill=%22%23fff%22 stroke-width=%224%22 stroke=%22%23ddd%22/%3E%3C/svg%3E'); background-size: cover; background-position: center;"></div> -->
+
       <p>Converted code (to embed Vimeo video on Beehiiv posts) will be generated and pasted here:</p>
-      <textarea name="custom" id="custom" placeholder="…" rows="6"></textarea>
-      <button disabled>Copy to clipboard</button>
+      <textarea name="custom" id="custom" placeholder="…" rows="9"></textarea>
+      <button disabled id="copy">Copy to clipboard</button>
 
     </main>
     <footer>
@@ -43,8 +49,11 @@
     </footer>
 
     <script>
+
+      const aspectRatio = (9 / 16 * 100).toFixed(2);
+
       // Fill placeholder of orignal form
-      original.value = `<div style="padding:64.87% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1137428663?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Nina Krug"></iframe></div><script src="https://player.vimeo.com/api/player.js">\</script\>`;
+      original.value = `<div style="padding:${ aspectRatio }% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1137428663?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Nina Krug"></iframe></div><script src="https://player.vimeo.com/api/player.js">\</script\>`;
 
       // Call validation function when form is submitted
       form.addEventListener("submit", (event) => {
@@ -111,18 +120,55 @@
         // Get styled div
         const div = elements.querySelector("div[style]");
 
+        // Define play button as inline SVG
+        const playButton = `url('data:image/svg+xml,%3Csvg width=%22960%22 xmlns=%22http://www.w3.org/2000/svg%22 height=%22540%22 viewBox=%220 0 960 540%22 fill=%22none%22%3E%3Cpath d=%22M459.623046875,240.1474609375C458.0234375,239.19921875,456,240.3525390625,456,242.2119140625L456,297.7880859375C456,299.6474609375,458.0234375,300.80078125,459.623046875,299.8525390625L506.515625,272.064453125C508.083984375,271.134765625,508.083984375,268.865234375,506.515625,267.935546875L459.623046875,240.1474609375Z%22 fill=%22%23fff%22 stroke-width=%224%22 stroke=%22%23ddd%22/%3E%3C/svg%3E')`;
+
         // Add video thumbnail as a background image
-        div.style.backgroundImage = `url(${ thumbnail })`;
+        div.style.backgroundImage = `${ playButton }, url(${ thumbnail })`;
         div.style.backgroundSize = "cover";
+        div.style.backgroundPosition = "center";
 
         // Insert script that removed href attribute from a tag (so link does not exist on web post, only email client)
-        const script = document.createElement('script');
+        const script = document.createElement("script");
         script.textContent = `document.currentScript.closest('a').removeAttribute('href');`;
-        elements.appendChild(script);
+        elements.prepend(script);
 
         // Paste custom code into target textarea
         custom.value = elements.outerHTML;
+
+        // Enable copy button
+        copy.disabled = false;
       }
+
+      // Copy textearea#custom value to clipboard
+      function copyToClipboard() {
+        // Gathers the desired text
+        const text = custom.value;
+
+        // Tries to copy to clipboard
+        navigator.clipboard.writeText(text).then(
+          (success) => {
+            
+            // Changes text
+            copy.textContent = "Copied";
+            copy.disabled = true;
+
+            // Reverts changes after 2s
+            setTimeout(() => {
+              copy.disabled = false;
+              copy.textContent = "Copy to clipboard";
+            }, 1000);
+          },
+          (error) => {
+            // Changes text
+            copy.textContent = "Error";
+            copy.disabled = True;
+          }
+        );
+      }
+
+      // Trigger copy function when copy button is clicked
+      copy.addEventListener("click", copyToClipboard)
 
       // Check if original textarea contains the necessary structure
       function validateForm() {
