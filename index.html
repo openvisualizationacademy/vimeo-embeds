@@ -15,13 +15,18 @@
   <body>
     <main>
       <h1>[WIP] Vimeo Embeds</h1>
-      <p>Generate Vimeo embed code to work on Beehiiv (web & email), with clickable thumbnail as fallback.</p>
+      <p>Generate Vimeo embed code to work on OVA’s <a href="https://openvisualizationacademy.beehiiv.com/">Beehiiv</a> (web & email), with clickable thumbnail as fallback.</p>
 
       <form id="form">
         <label>
-          <span>Paste embed code provided by Vimeo:</span>
-          <textarea name="original" id="original" placeholder='<div style="padding: …' rows="4" required></textarea>
+          <span>Paste <strong>Vimeo embed</strong> code provided by Vimeo’s sharing feature:</span>
+          <textarea name="original" id="original" placeholder='<div style="padding:…' rows="4" required></textarea>
         </label>
+        <label>
+          <span>Paste <strong>Beehiiv post</strong> link (web version that runs JS and video):</span>
+          <input name="link" id="link" placeholder="https://openvisualizationacademy.beehiiv.com/p/…" required></textarea>
+        </label>
+
         <button>Convert to Beehiiv</button>
       </form>
 
@@ -72,8 +77,12 @@
         console.log(id);
 
         // Define href
-        const href = `https://vimeo.com/${ id }`;
-        // TODO: use Beehiiv post URL, instead of Vimeo URL directly
+        let href = `https://vimeo.com/${ id }`;
+        
+        // Try to use Beehiiv post URL, instead of Vimeo URL directly
+        if (link && link.value.startsWith("http")) {
+          href = link.value;
+        }
 
         // If wrapper element is an <a> tag
         if (elements.tagName === "A") {
@@ -95,6 +104,10 @@
         div.style.backgroundImage = `url(${ thumbnail })`;
         div.style.backgroundSize = "cover";
 
+        // Insert script that removed href attribute from a tag (so link does not exist on web post, only email client)
+        const script = document.createElement('script');
+        script.textContent = `document.currentScript.closest('a').removeAttribute('href');`;
+        elements.appendChild(script);
 
         // Paste custom code into target textarea
         custom.value = elements.outerHTML;
