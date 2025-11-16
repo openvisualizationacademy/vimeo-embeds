@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vimeo Embeds</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
+    <style>
+      textarea {
+        font-family: monospace;
+        font-size: small;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>[WIP] Vimeo Embeds</h1>
+      <p>Generate Vimeo embed code to work on Beehiiv (web & email), with clickable thumbnail as fallback.</p>
+
+      <form id="form">
+        <label>
+          <span>Paste embed code provided by Vimeo:</span>
+          <textarea name="original" id="original" placeholder='<div style="padding: …' rows="10" required></textarea>
+        </label>
+        <button>Convert to Beehiiv</button>
+      </form>
+
+      <br><br>
+      <hr>
+
+      <p>Converted code (to embed Vimeo video on Beehiiv posts) will be generated and pasted here:</p>
+      <textarea name="custom" id="custom" placeholder="…" rows="10"></textarea>
+      <button disabled>Copy to clipboard</button>
+
+    </main>
+    <footer>
+      Created quickly
+    </footer>
+
+    <script>
+      // Fill placeholder of orignal form
+      original.value = `<div style="padding:64.87% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1137428663?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Nina Krug"></iframe></div><script src="https://player.vimeo.com/api/player.js">\</script\>`;
+
+      // Call validation function when form is submitted
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        validateForm();
+      });
+
+      // Get HTML nodes from string
+      function html(string) {
+        // Create a DocumentFragment
+        const fragment = document.createRange().createContextualFragment(string);
+
+        // If it has a single child element, return it
+        if (fragment.childElementCount === 1) {
+          return fragment.firstElementChild;
+        }
+
+        // Otherwise, wrap all children in a div and return them
+        const div = document.createElement("div");
+        div.append(...fragment.children);
+        return div;
+      }
+
+      // Inject custom elements and attributes to make it Beehiiv friendly
+      function customize(elements) {
+
+        // Get video ID
+        const id = elements.querySelector("iframe").src.match(/\/video\/(\d+)/)?.[1];
+
+        console.log(id);
+
+        // Get video thumbnail (using a 3rd party service)
+        const thumbnail = `https://vumbnail.com/${ id }.jpg`
+        // TODO: extract the absolute URL from http://vimeo.com/api/v2/video/${ id }.json
+
+        // Get styled div
+        const div = elements.querySelector("div[style]");
+
+        // Add video thumbnail as a background image
+        div.style.backgroundImage = `url(${ thumbnail })`;
+        div.style.backgroundSize = "cover";
+
+
+        // Paste custom code into target textarea
+        custom.value = elements.outerHTML;
+      }
+
+      // Check if original textarea contains the necessary structure
+      function validateForm() {
+        const elements = html(original.value);
+
+        console.log(elements);
+        console.log(elements.outerHTML);
+
+        // Check if original embed code contains a Vimeo iframe
+        if (!elements.querySelector('iframe[src^="https://player.vimeo.com/"]')) {
+          alert("Could not find vimeo iframe");
+          return false;
+        }
+
+        // TODO: Add more validation
+        
+        customize(elements);
+      }
+    </script>
+  </body>
+</html>
