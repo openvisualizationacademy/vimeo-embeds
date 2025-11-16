@@ -69,7 +69,7 @@
       }
 
       // Inject custom elements and attributes to make it Beehiiv friendly
-      function customize(elements) {
+      async function customize(elements) {
 
         // Get video ID
         const id = elements.querySelector("iframe").src.match(/\/video\/(\d+)/)?.[1];
@@ -79,7 +79,7 @@
         // Define href
         let href = `https://vimeo.com/${ id }`;
         
-        // Try to use Beehiiv post URL, instead of Vimeo URL directly
+        // Prioritize using Beehiiv post URL, instead of Vimeo URL directly
         if (link && link.value.startsWith("http")) {
           href = link.value;
         }
@@ -88,14 +88,25 @@
         if (elements.tagName === "A") {
           // Set anchor href
           elements.href = href;
+
+          // Allow children element to fit full width
+          elements.style.display = "block";
         } else {
           alert("Could not create link");
           return false;
         }
 
         // Get video thumbnail (using a 3rd party service)
-        const thumbnail = `https://vumbnail.com/${ id }.jpg`
-        // TODO: extract the absolute URL from http://vimeo.com/api/v2/video/${ id }.json
+        let thumbnail = `https://vumbnail.com/${ id }.jpg`
+
+        // Prioritize extracting absolute URL from http://vimeo.com/api/v2/video/${ id }.json
+        try {
+          const response = await fetch(`http://vimeo.com/api/v2/video/${ id }.json`);
+          const data = await response.json();
+          thumbnail = data[0].thumbnail_large;
+        } catch (error) {
+          console.error(error);
+        }
 
         // Get styled div
         const div = elements.querySelector("div[style]");
