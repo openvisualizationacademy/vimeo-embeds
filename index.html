@@ -113,6 +113,7 @@
           const data = await response.json();
           thumbnail = data[0].thumbnail_large;
         } catch (error) {
+          alert("Vimeo thumbnail URL not fetched. Using vumbnail.com as a fallback");
           console.error(error);
         }
 
