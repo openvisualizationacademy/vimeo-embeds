@@ -137,6 +137,10 @@
         div.style.backgroundSize = "contain";
         div.style.backgroundPosition = "center";
 
+        // IMPORTANT: For Beehiiv, remove " and &quot; from generated style attribute, as they break it midway
+        const cleanStyle = div.getAttribute("style").replaceAll(`url("`, `url(`).replaceAll(`")`, `)`);
+        div.setAttribute("style", cleanStyle) ;
+
         // Insert script that removed href attribute from a tag (so link does not exist on web post, only email client)
         const script = document.createElement("script");
         script.textContent = `document.currentScript.closest('a').removeAttribute('href');`;
