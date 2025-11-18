@@ -129,9 +129,12 @@
         // const playButton = `url(https://openvisualizationacademy.github.io/vimeo-embeds/play.png)`;
         const playButton = `url(https://ovastgacct.blob.core.windows.net/ovamedia/original_images/play.png)`;
 
+        // Add black background to cover areas that might not be covered by the thumbnail
+        div.style.backgroundColor = "black";
+
         // Add video thumbnail as a background image
         div.style.backgroundImage = `${ playButton }, url(${ thumbnail })`;
-        div.style.backgroundSize = "cover";
+        div.style.backgroundSize = "contain";
         div.style.backgroundPosition = "center";
 
         // Insert script that removed href attribute from a tag (so link does not exist on web post, only email client)
