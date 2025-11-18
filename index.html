@@ -132,6 +132,9 @@
         // Add black background to cover areas that might not be covered by the thumbnail
         div.style.backgroundColor = "black";
 
+        // Prevent contained background image from tiling
+        div.style.backgroundRepeat = "no-repeat"
+
         // Add video thumbnail as a background image
         div.style.backgroundImage = `${ playButton }, url(${ thumbnail })`;
         div.style.backgroundSize = "contain";
